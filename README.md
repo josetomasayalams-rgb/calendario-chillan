@@ -40,12 +40,27 @@ Por defecto corre en **modo local**. Ya puedes crear rangos, navegar meses/años
 
 ## 3) Publicarlo (URL para las familias)
 
-**Netlify Drop** (sin cuenta): arrastra la carpeta entera a
-https://app.netlify.com/drop → te da una URL al instante.
+Camino recomendado: **GitHub (privado) + Cloudflare Pages + Cloudflare Access**.
+Todo gratis. La familia **no** necesita cuenta GitHub: entra con su email
+(Cloudflare Access manda un código de 6 dígitos).
 
-Alternativa: **Vercel** (`npx vercel`) o **GitHub Pages**.
+1. **Subir el código a GitHub** (solo José): crea un repo **privado** y haz `push`
+   (`git remote add origin <URL> && git push -u origin main`).
+2. **Cloudflare Pages** (`dash.cloudflare.com` → Workers & Pages → Create →
+   Pages → Connect to Git): elige el repo. Build settings:
+   *Framework preset* = **None**, *Build command* vacío, *Build output directory*
+   = **`/`** (raíz). Save and Deploy → URL `https://<proyecto>.pages.dev`.
+3. **Cloudflare Access** (portón familiar): Zero Trust (plan Free, ≤50 usuarios)
+   → Access → Applications → Add application → **Self-hosted**, dominio
+   `<proyecto>.pages.dev`. Policy: tipo **Allow**, *Action* Include,
+   **Emails** = correos de la familia. Guardar.
+4. Comparte la URL. Al abrirla pedirá email → código → calendario compartido.
 
-Importante: sube la carpeta **con** `assets/chillan-bg.jpg`.
+> Sube la carpeta **con** `assets/chillan-bg.jpg`.
+>
+> **Atajo rápido (sin cuenta ni portón):** arrastra la carpeta a
+> https://app.netlify.com/drop → URL al instante. Útil para probar, pero queda
+> sin el portón Access (privacidad solo por URL desconocida).
 
 ---
 
