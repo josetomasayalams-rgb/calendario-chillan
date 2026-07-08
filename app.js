@@ -27,7 +27,7 @@ const CONFIG = {
   airbnbMarginDays: 4,   // primer día reservable = hoy + N (margen Airbnb)
 };
 
-const VERSION = "9";   // marca visible (pestaña + badge) para detectar si hay caché
+const VERSION = "12";  // marca visible (pestaña + badge) para detectar si hay caché
 const MONTHS = ["Enero","Febrero","Marzo","Abril","Mayo","Junio",
                 "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 const MON_SHORT = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
@@ -143,9 +143,11 @@ async function load(){
   render();   // siempre renderiza (con lo último que tenga) y muestra el error si hubo
 }
 
-// ---------- Render principal ----------
+// En dispositivos sin hover (touch) no bindeamos mouseenter/mouseleave: la
+// preview de brush por hover es desktop-only. En touch el brush-bar muestra
+// el rango y se actualiza por onCellClick → render.
+const HAS_HOVER = window.matchMedia("(hover: hover)").matches;
 function render(){
-  state.firstBookable = firstBookableIso();   // refresca el margen (deriva a medianoche)
   renderNav();
   renderFamilySelect();
   renderGrid();
@@ -260,8 +262,10 @@ function renderGrid(){
 
     if (!blocked){
       cell.addEventListener("click", () => onCellClick(dateStr));
-      cell.addEventListener("mouseenter", () => { if (state.brush.start){ state.brush.hover = dateStr; updatePreview(); } });
-      cell.addEventListener("mouseleave", () => { if (state.brush.hover){ state.brush.hover = null; updatePreview(); } });
+      if (HAS_HOVER){
+        cell.addEventListener("mouseenter", () => { if (state.brush.start){ state.brush.hover = dateStr; updatePreview(); } });
+        cell.addEventListener("mouseleave", () => { if (state.brush.hover){ state.brush.hover = null; updatePreview(); } });
+      }
     }
     grid.appendChild(cell);
   }
@@ -496,6 +500,12 @@ function openPopover(r, anchor){
 }
 
 function positionPopover(pop, anchor){
+  // Mobile (≤560px): bottom sheet — el CSS ya fija left/right/bottom con !important.
+  if (window.innerWidth <= 560){
+    pop.style.left = "";
+    pop.style.top = "";
+    return;
+  }
   const r = anchor.getBoundingClientRect();
   let left = r.left;
   let top = r.bottom + 6;
@@ -576,6 +586,75 @@ function bind(){
   window.addEventListener("resize", () => { document.getElementById("pop").hidden = true; });
 }
 
+// ---------- Lock screen con clave familiar ----------
+function setupLock(){
+  const FAMILY_KEY = "9014";
+  const lock = document.getElementById("lock");
+  const pins = Array.from(document.querySelectorAll("#lock-pins .lock-pin"));
+  const err = document.getElementById("lock-err");
+  if (!lock || pins.length !== 4) return;
+
+  document.body.classList.add("locked");
+  pins[0].focus();
+
+  function getCode(){ return pins.map(p => p.value).join(""); }
+  function clearPins(){
+    pins.forEach(p => { p.value = ""; p.classList.remove("filled", "wrong"); });
+    pins[0].focus();
+  }
+  function fail(msg){
+    err.textContent = msg;
+    pins.forEach(p => p.classList.add("wrong"));
+    setTimeout(() => {
+      pins.forEach(p => p.classList.remove("wrong"));
+      clearPins();
+    }, 550);
+  }
+  function success(){
+    lock.classList.add("unlocking");
+    document.body.classList.remove("locked");
+    setTimeout(() => {
+      lock.hidden = true;
+      err.textContent = "";
+    }, 600);
+  }
+
+  pins.forEach((pin, i) => {
+    pin.addEventListener("input", () => {
+      pin.value = pin.value.replace(/\D/g, "").slice(0, 1);
+      pin.classList.toggle("filled", pin.value.length === 1);
+      if (pin.value && i < pins.length - 1){
+        pins[i + 1].focus();
+      }
+      if (i === pins.length - 1 && getCode().length === pins.length){
+        if (getCode() === FAMILY_KEY) success();
+        else fail("Clave incorrecta");
+      }
+    });
+    pin.addEventListener("keydown", e => {
+      if (e.key === "Backspace" && !pin.value && i > 0){
+        pins[i - 1].focus();
+        pins[i - 1].value = "";
+        pins[i - 1].classList.remove("filled");
+      }
+      if (e.key === "ArrowLeft" && i > 0){ e.preventDefault(); pins[i - 1].focus(); }
+      if (e.key === "ArrowRight" && i < pins.length - 1){ e.preventDefault(); pins[i + 1].focus(); }
+    });
+    pin.addEventListener("paste", e => {
+      e.preventDefault();
+      const text = (e.clipboardData || window.clipboardData).getData("text");
+      const digits = text.replace(/\D/g, "").split("").slice(0, pins.length);
+      digits.forEach((d, j) => { pins[j].value = d; pins[j].classList.add("filled"); });
+      const last = Math.min(digits.length, pins.length) - 1;
+      pins[Math.max(0, last)].focus();
+      if (digits.length === pins.length){
+        if (digits.join("") === FAMILY_KEY) success();
+        else fail("Clave incorrecta");
+      }
+    });
+  });
+}
+
 // ---------- Init ----------
 (async function main(){
   try{
@@ -587,6 +666,7 @@ function bind(){
     await load();
     updateUndoBtn();
     updateAdminUI();
+    setupLock();
     // el desplegable parte CERRADO; se abre/toca con la flecha (toggle confiable)
   }catch(err){
     console.error("Init error:", err);

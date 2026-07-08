@@ -19,16 +19,24 @@ body{
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,system-ui,sans-serif;
   color:var(--text);
   min-height:100dvh;
-  padding:max(16px,env(safe-area-inset-top)) 14px 24px;
+  padding:max(16px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) 24px max(14px,env(safe-area-inset-left));
   -webkit-font-smoothing:antialiased;
   overflow-x:hidden;
+  -webkit-tap-highlight-color:transparent;
 }
 
-/* Fondo */
+/* Fondo — versión mobile en pantallas chicas, completa en desktop. Las dos
+   URLs se declaran dentro de @media para que el browser NO descargue la que
+   no va a usar (image-set() tiende a probar todas). */
 .bg-layer{
   position:fixed; inset:0; z-index:-2;
-  background:url("assets/chillan-bg.jpg") center/cover no-repeat fixed;
+  background-image:url("assets/chillan-bg.jpg");
+  background-position:center; background-size:cover; background-repeat:no-repeat;
+  background-attachment:fixed;
   transform:scale(1.04); /* evita borde blanco al hacer scroll elástico */
+}
+@media (max-width:900px){
+  .bg-layer{ background-image:url("assets/chillan-bg-mobile.jpg"); }
 }
 body::before{ /* velo para legibilidad */
   content:""; position:fixed; inset:0; z-index:-1;
@@ -60,13 +68,13 @@ body::before{ /* velo para legibilidad */
 
 /* Layout */
 .app{
-  max-width:1080px; margin:0 auto; padding:16px clamp(12px,3vw,26px) 18px;
+  max-width:min(1400px, 100%); margin:0 auto; padding:16px clamp(12px,3vw,26px) 18px;
 }
 .topbar{
   display:flex; flex-wrap:wrap; gap:12px 16px; align-items:center; justify-content:space-between;
   margin-bottom:14px;
 }
-.title h1{ font-size:clamp(20px,3.4vw,30px); margin:0; font-weight:700; letter-spacing:.2px; }
+.title h1{ font-size:clamp(22px,2.8vw,36px); margin:0; font-weight:700; letter-spacing:.2px; }
 .title .subtitle{ margin:2px 0 0; color:var(--text-dim); font-size:13px; }
 
 .nav{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
@@ -74,6 +82,7 @@ body::before{ /* velo para legibilidad */
   border:1px solid var(--glass-brd); background:var(--glass-bg); color:var(--text);
   -webkit-backdrop-filter:blur(12px) saturate(160%); backdrop-filter:blur(12px) saturate(160%);
   border-radius:999px; padding:8px 14px; font-size:14px; cursor:pointer;
+  touch-action:manipulation;
   transition:transform .08s ease, background .15s ease;
 }
 .btn:hover{ background:var(--glass-bg-strong); }
@@ -103,9 +112,12 @@ input[type=date].glass::-webkit-calendar-picker-indicator{ filter:invert(1) opac
 .fs-trigger{
   display:inline-flex; align-items:center; gap:10px; font:inherit; font-size:14px; color:var(--text);
   cursor:pointer; padding:9px 16px 9px 12px; border-radius:999px; min-width:210px;
+  background:rgba(255,255,255,.22);
+  -webkit-backdrop-filter:blur(28px) saturate(180%); backdrop-filter:blur(28px) saturate(180%);
+  border:1px solid var(--glass-brd);
   transition:background .15s ease, box-shadow .15s ease;
 }
-.fs-trigger:hover{ background:var(--glass-bg-strong); }
+.fs-trigger:hover{ background:rgba(255,255,255,.28); }
 .fs-trigger .dot{ width:14px; height:14px; box-shadow:0 0 0 1px rgba(255,255,255,.3); }
 .fs-trigger .fs-label{ flex:1; text-align:left; }
 .fs-trigger .fs-chev{ opacity:.7; font-size:12px; transition:transform .2s ease; }
@@ -117,11 +129,15 @@ input[type=date].glass::-webkit-calendar-picker-indicator{ filter:invert(1) opac
 .fs-menu{
   position:absolute; top:calc(100% + 8px); left:0; z-index:30; min-width:100%; width:max-content;
   padding:6px; display:flex; flex-direction:column; gap:2px; animation:pop .12s ease;
+  background:rgba(255,255,255,.22);
+  -webkit-backdrop-filter:blur(28px) saturate(180%); backdrop-filter:blur(28px) saturate(180%);
+  border:1px solid var(--glass-brd);
 }
 .fs-row{
   display:flex; align-items:center; gap:10px; font:inherit; font-size:14px; color:var(--text);
   cursor:pointer; padding:9px 12px; border-radius:10px; text-align:left; min-width:190px;
   border:1px solid transparent; background:transparent;
+  touch-action:manipulation;
 }
 .fs-row:hover{
   background:rgba(255,255,255,.12);
@@ -144,12 +160,13 @@ input[type=date].glass::-webkit-calendar-picker-indicator{ filter:invert(1) opac
 .grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
 
 .cell{
-  position:relative; min-height:clamp(58px,11vw,96px);
+  position:relative; min-height:clamp(64px,6.5vw,130px);
   border-radius:var(--round-sm);
   border:1px solid var(--glass-brd-soft);
   background:rgba(255,255,255,.06);
   -webkit-backdrop-filter:blur(8px) saturate(150%); backdrop-filter:blur(8px) saturate(150%);
   padding:6px 6px 18px; cursor:pointer; overflow:hidden;
+  touch-action:manipulation;
   transition:background .15s ease, transform .08s ease;
 }
 .cell:hover{ background:rgba(255,255,255,.12); }
@@ -159,8 +176,8 @@ input[type=date].glass::-webkit-calendar-picker-indicator{ filter:invert(1) opac
 
 .segments{ position:absolute; left:4px; right:4px; top:26px; display:flex; flex-direction:column; gap:3px; pointer-events:none; }
 .seg{
-  height:13px; border-radius:0; display:flex; align-items:center; padding:0 6px;
-  font-size:9.5px; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden;
+  height:clamp(13px, 1.4vw, 18px); border-radius:0; display:flex; align-items:center; padding:0 6px;
+  font-size:clamp(9.5px, 1.05vw, 12px); font-weight:600; color:#fff; white-space:nowrap; overflow:hidden;
   pointer-events:auto; cursor:pointer;
   text-shadow:0 1px 1px rgba(0,0,0,.35);
   box-shadow:0 1px 3px rgba(0,0,0,.25);
@@ -291,9 +308,138 @@ body.admin-mode .app{ box-shadow:0 0 0 2px #f59e0b, var(--shadow); }
   border:1px solid var(--glass-brd-soft);
 }
 
+/* ---------- Lock screen ---------- */
+body.locked{ overflow:hidden; }
+body.locked .app{
+  filter:blur(14px) saturate(140%) brightness(.85);
+  transform:scale(1.015);
+  pointer-events:none;
+  transition:filter .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1);
+}
+.lock-overlay{
+  position:fixed; inset:0; z-index:200; display:grid; place-items:center;
+  background:rgba(8,12,28,.35);
+  -webkit-backdrop-filter:blur(18px) saturate(150%);
+  backdrop-filter:blur(18px) saturate(150%);
+  padding:16px;
+  animation:lockFadeIn .25s ease;
+}
+.lock-overlay.unlocking{
+  animation:lockFadeOut .55s cubic-bezier(.16,1,.3,1) forwards;
+}
+.lock-overlay.unlocking .lock-card{
+  animation:lockOut .55s cubic-bezier(.16,1,.3,1) forwards;
+}
+/* Flash radial: halo blanco que se expande al desbloquear. Va en el overlay
+   para que no quede recortado por el border-radius de la card. */
+.lock-overlay::before{
+  content:""; position:absolute; left:50%; top:50%;
+  width:520px; height:520px; margin-left:-260px; margin-top:-260px;
+  background:radial-gradient(circle, rgba(255,255,255,.55) 0%, rgba(255,255,255,.18) 35%, rgba(255,255,255,0) 70%);
+  opacity:0; pointer-events:none; transform:scale(.2);
+}
+.lock-overlay.unlocking::before{
+  animation:lockFlash .75s cubic-bezier(.16,1,.3,1) forwards;
+}
+.lock-card{
+  position:relative;
+  width:min(360px, calc(100% - 32px));
+  padding:28px 24px 22px;
+  text-align:center;
+  border-radius:var(--round);
+  animation:lockPopIn .55s cubic-bezier(.16,1,.3,1) both;
+  animation-delay:.05s;
+}
+.lock-icon{ font-size:28px; margin-bottom:6px; }
+.lock-card h2{ margin:0 0 4px; font-size:20px; font-weight:700; letter-spacing:.2px; }
+.lock-sub{ margin:0 0 18px; font-size:13px; color:var(--text-dim); }
+.lock-pins{ display:flex; gap:10px; justify-content:center; margin:6px 0 4px; }
+.lock-pin{
+  width:54px; height:64px;
+  border-radius:14px; border:1px solid var(--glass-brd);
+  background:rgba(255,255,255,.18);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  backdrop-filter:blur(20px) saturate(180%);
+  color:var(--text); font-size:26px; font-weight:700;
+  text-align:center; outline:none;
+  -webkit-text-security:disc; text-security:disc;
+  touch-action:manipulation;
+  transition:transform .15s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
+  caret-color:transparent;
+}
+.lock-pin:focus{
+  border-color:rgba(255,255,255,.7);
+  box-shadow:0 0 0 3px rgba(255,255,255,.18);
+  transform:translateY(-1px);
+}
+.lock-pin.filled{ background:rgba(255,255,255,.28); }
+.lock-pin.wrong{
+  border-color:rgba(255,120,120,.75);
+  animation:lockShake .5s;
+}
+.lock-err{ min-height:18px; margin:10px 0 0; color:#ffd2d2; font-size:12px; }
+
+@keyframes lockFadeIn{ from{opacity:0} to{opacity:1} }
+@keyframes lockFadeOut{ to{opacity:0; -webkit-backdrop-filter:blur(0px) saturate(100%); backdrop-filter:blur(0px) saturate(100%)} }
+@keyframes lockPopIn{
+  from{opacity:0; transform:translateY(12px) scale(.96); filter:blur(8px)}
+  to{opacity:1; transform:none; filter:none}
+}
+@keyframes lockOut{
+  0%  {opacity:1; transform:translateY(0) scale(1); filter:blur(0)}
+  100%{opacity:0; transform:translateY(-10px) scale(1.04); filter:blur(10px)}
+}
+@keyframes lockFlash{
+  0%  {opacity:0; transform:scale(.2)}
+  35% {opacity:.55}
+  100%{opacity:0; transform:scale(1.6)}
+}
+@keyframes lockShake{
+  10%,90%{transform:translateX(-2px)}
+  20%,80%{transform:translateX(3px)}
+  30%,50%,70%{transform:translateX(-5px)}
+  40%,60%{transform:translateX(5px)}
+}
+@keyframes popUp{
+  from{opacity:0; transform:translateY(20px)}
+  to{opacity:1; transform:none}
+}
+
 @media (max-width:560px){
   .nav .btn:not(.icon):not(.primary):not(#today):not(#undo){ display:none; } /* deja ‹ › Hoy + Reserva + Deshacer en móvil */
   .title h1{ font-size:20px; }
   .weekdays div, .cell .num{ font-size:10px; }
   .seg{ font-size:0; padding:0; height:10px; }
+  /* Popover como bottom sheet en móvil */
+  .popover{
+    left:8px !important; right:8px !important; width:auto !important;
+    top:auto !important; bottom:12px;
+    border-radius:18px 18px 14px 14px;
+    animation:popUp .18s ease;
+  }
+}
+
+/* Landscape en celular (alto ≤500): celdas más bajas, hint-bar oculto */
+@media (orientation:landscape) and (max-height:500px){
+  .topbar{ margin-bottom:6px; }
+  .title h1{ font-size:18px; }
+  .title .subtitle{ display:none; }
+  .fam-picker{ margin-bottom:6px; }
+  .cell{ min-height:46px; padding:4px 4px 14px; }
+  .grid{ gap:4px; }
+  .calendar{ gap:4px; }
+  .weekdays{ gap:4px; }
+  .hint-bar{ display:none; }
+  .lock-card{ padding:18px 18px 14px; }
+  .lock-card h2{ font-size:17px; }
+  .lock-pin{ width:44px; height:52px; font-size:22px; }
+  .lock-pins{ gap:8px; margin:10px 0 0; }
+}
+
+/* Tablet portrait / celu grande: tipografía y padding más aireado. Excluye
+   landscape de celular (que tiene su propio breakpoint más abajo). */
+@media (max-width:900px) and (min-width:561px) and (orientation:portrait){
+  .app{ padding:12px 16px 16px; }
+  .title h1{ font-size:24px; }
+  .cell{ min-height:72px; }
 }

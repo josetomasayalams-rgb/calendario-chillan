@@ -2,14 +2,41 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0b1020">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Chillán">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Reservas · Departamento Chillán</title>
-  <link rel="stylesheet" href="styles.css?v=8">
+
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png">
+
+  <link rel="preload" as="image" href="assets/chillan-bg-mobile.jpg" fetchpriority="high" media="(max-width:900px)">
+
+  <link rel="stylesheet" href="styles.css?v=12">
 </head>
 <body>
   <div class="bg-layer" aria-hidden="true"></div>
+
+  <!-- Lock screen con clave familiar -->
+  <div id="lock" class="lock-overlay" role="dialog" aria-modal="true" aria-labelledby="lock-title">
+    <div class="lock-card glass">
+      <div class="lock-icon" aria-hidden="true">🔒</div>
+      <h2 id="lock-title">Departamento Chillán</h2>
+      <p class="lock-sub">Ingresa la clave familiar</p>
+      <div class="lock-pins" id="lock-pins">
+        <input class="lock-pin" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]*" maxlength="1" aria-label="Dígito 1">
+        <input class="lock-pin" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Dígito 2">
+        <input class="lock-pin" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Dígito 3">
+        <input class="lock-pin" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Dígito 4">
+      </div>
+      <p class="lock-err" id="lock-err" aria-live="polite"></p>
+    </div>
+  </div>
 
   <main class="app glass">
     <header class="topbar">
@@ -103,6 +130,6 @@
     <button class="btn primary bb-confirm" id="brush-confirm">Confirmar reserva</button>
   </div>
 
-  <script src="app.js?v=8"></script>
+  <script src="app.js?v=12" defer></script>
 </body>
 </html>
