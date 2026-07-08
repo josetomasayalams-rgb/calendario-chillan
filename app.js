@@ -9,8 +9,8 @@
 
 const CONFIG = {
   // 👇 Pega aquí tus claves de Supabase (README.md). Vacío = modo local.
-  supabaseUrl: "",
-  supabaseAnonKey: "",
+  supabaseUrl: "https://zfzzaldibtlaslgkhtlj.supabase.co",
+  supabaseAnonKey: "sb_publishable_cumFbr_o-GSvSWGlR2aekw_Tw5rE8nV",
 
   families: [
     { id: "papas",          name: "Papás",          color: "#A855F7" },
