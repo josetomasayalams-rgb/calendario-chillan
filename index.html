@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1020">
+  <title>Reservas · Departamento Chillán</title>
+  <link rel="stylesheet" href="styles.css?v=8">
+</head>
+<body>
+  <div class="bg-layer" aria-hidden="true"></div>
+
+  <main class="app glass">
+    <header class="topbar">
+      <div class="title">
+        <h1>Departamento Chillán</h1>
+        <p class="subtitle">Reservas familiares</p>
+      </div>
+      <nav class="nav">
+        <button id="prev" class="btn glass icon" aria-label="Mes anterior">‹</button>
+        <select id="month" class="glass" aria-label="Mes"></select>
+        <select id="year" class="glass" aria-label="Año"></select>
+        <button id="next" class="btn glass icon" aria-label="Mes siguiente">›</button>
+        <button id="today" class="btn glass">Hoy</button>
+        <button id="add" class="btn glass primary">+ Reserva</button>
+        <button id="undo" class="btn glass" disabled title="Deshacer último cambio">↩ Deshacer</button>
+      </nav>
+    </header>
+
+    <div class="fam-picker">
+      <span class="fp-label">Reservar como</span>
+      <div class="fam-select" id="fam-select">
+        <button type="button" class="fs-trigger glass" id="fs-trigger"
+                aria-haspopup="listbox" aria-expanded="false">
+          <span class="dot" id="fs-dot"></span>
+          <span class="fs-label" id="fs-label">Elegir familia</span>
+          <span class="fs-chev">▾</span>
+        </button>
+        <div class="fs-menu glass" id="fs-menu" hidden role="listbox"></div>
+      </div>
+    </div>
+
+    <section class="legend glass-soft" id="legend" aria-label="Familias"></section>
+
+    <div class="hint-bar glass-soft" id="hint-bar"></div>
+
+    <section class="calendar">
+      <div class="weekdays" id="weekdays"></div>
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <footer class="foot">
+      <span id="mode-badge" class="mode-badge"></span>
+      <button id="admin" class="btn glass admin-btn" title="Modo admin: reservar sin restricción + varias familias">🔒 Admin</button>
+    </footer>
+  </main>
+
+  <!-- Modal nueva / editar reserva -->
+  <div class="modal-overlay" id="modal" hidden>
+    <div class="modal glass" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <h2 id="modal-title">Nueva reserva</h2>
+      <p class="modal-tip">Tip: también puedes elegir una familia arriba y tocar los días directo en el calendario.</p>
+
+      <label class="field">
+        <span class="lbl">Familias</span>
+        <div class="families" id="fam-checks"></div>
+      </label>
+
+      <div class="row">
+        <label class="field">
+          <span class="lbl">Desde</span>
+          <input type="date" id="start" class="glass">
+        </label>
+        <label class="field">
+          <span class="lbl">Hasta</span>
+          <input type="date" id="end" class="glass">
+        </label>
+      </div>
+
+      <label class="field">
+        <span class="lbl">Nota <em>(opcional)</em></span>
+        <input type="text" id="note" class="glass" placeholder="Ej: cumple, mantención…">
+      </label>
+
+      <p class="hint" id="hint"></p>
+
+      <div class="modal-actions">
+        <button class="btn ghost" id="cancel">Cancelar</button>
+        <button class="btn primary" id="save">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popover eliminar -->
+  <div class="popover glass" id="pop" hidden></div>
+
+  <!-- Barra de confirmación de selección en calendario -->
+  <div class="brush-bar glass" id="brush-bar">
+    <span class="bb-fam"></span>
+    <span class="bb-range"></span>
+    <button class="btn ghost icon bb-cancel" id="brush-cancel" aria-label="Cancelar selección">✕</button>
+    <button class="btn primary bb-confirm" id="brush-confirm">Confirmar reserva</button>
+  </div>
+
+  <script src="app.js?v=8"></script>
+</body>
+</html>

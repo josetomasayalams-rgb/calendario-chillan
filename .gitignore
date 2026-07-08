@@ -1,0 +1,11 @@
+# Basura del sistema
+.DS_Store
+
+# No parte de la app (artefacto sin referencia en el código)
+ruvector.db
+
+# Foto fuente de 17 MB (no se usa; el fondo optimizado es assets/chillan-bg.jpg)
+oficial-nevados_*.jpg
+
+# Artefacto de build local para debug (app canónica = index.html)
+calendario.html

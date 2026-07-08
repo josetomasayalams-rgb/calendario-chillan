@@ -1,0 +1,68 @@
+# Reservas · Departamento Chillán
+
+Calendario compartido para reservar el departamento, con estética **Liquid Glass**
+sobre una foto de los Nevados de Chillán. Cinco familias, cada una con su color.
+
+Funciona de dos formas:
+- **Modo local** (sin configurar nada): guarda en el navegador. Suficiente para probar.
+- **Modo live** (con Supabase): las familias ven y editan el mismo calendario en
+  tiempo real desde cualquier dispositivo.
+
+---
+
+## 1) Probarlo localmente
+
+```bash
+cd "PLATAFORMAS CHILLAN"
+python3 -m http.server 8000
+```
+Abrir http://localhost:8000 (hay que usar `http`, no abrir el archivo directo).
+
+Por defecto corre en **modo local**. Ya puedes crear rangos, navegar meses/años, etc.
+
+## 2) Activar modo live (Supabase) — para compartir entre familias
+
+1. Crea una cuenta gratis en **https://supabase.com** y un proyecto nuevo.
+2. Ve a **SQL Editor → New query**, pega el contenido de `schema.sql` y **Run**.
+3. Ve a **Project Settings → API** y copia:
+   - **Project URL**
+   - **anon public key**
+4. Pégalas en `app.js`, al inicio, en `CONFIG`:
+   ```js
+   supabaseUrl: "https://xxxx.supabase.co",
+   supabaseAnonKey: "eyJhbGciOi....",
+   ```
+5. Recarga. El indicador abajo dirá **“Modo live · sincronizado”**.
+
+> Las claves `anon` son públicas por diseño; la seguridad la da el *Row Level Security*
+> de la tabla (ver `schema.sql`). Como la URL queda privada entre la familia, alcanza
+> para v1. Si la URL va a salir del círculo, agrega un passcode compartido (futuro).
+
+## 3) Publicarlo (URL para las familias)
+
+**Netlify Drop** (sin cuenta): arrastra la carpeta entera a
+https://app.netlify.com/drop → te da una URL al instante.
+
+Alternativa: **Vercel** (`npx vercel`) o **GitHub Pages**.
+
+Importante: sube la carpeta **con** `assets/chillan-bg.jpg`.
+
+---
+
+## Familias y colores
+
+| Grupo | Color |
+|-------|-------|
+| Papás | morado `#A855F7` |
+| Quiroz Ayala | verde `#10B981` |
+| Ayala Gonzalez | ámbar `#F59E0B` |
+| Cattan Ayala | rosa `#EC4899` |
+| Coco | azul `#3B82F6` |
+
+Para cambiar un color o nombre, edita el arreglo `CONFIG.families` en `app.js`.
+
+## Archivos
+
+- `index.html` / `styles.css` / `app.js` — la app (vanilla JS, sin build).
+- `assets/chillan-bg.jpg` — fondo optimizado (1.3 MB).
+- `schema.sql` — tabla + permisos + realtime para Supabase.
